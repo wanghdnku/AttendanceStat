@@ -102,3 +102,8 @@ ENV/
 
 # macos
 *.DS_Store
+
+# jetbrain
+.idea/
+.idea
+/.idea

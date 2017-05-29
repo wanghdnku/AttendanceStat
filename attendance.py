@@ -45,28 +45,40 @@ def turnout_checking(department, get_on_time, get_off_time):
     return result
 
 
-def work_calendar(year, month):
+def work_calendar(input_year, input_month):
     days = []
 
     # 生成日历
-    if month in [1, 3, 5, 7, 8, 10, 12]:
+    if input_month in [1, 3, 5, 7, 8, 10, 12]:
         days_num = 31
-    elif month in [4, 6, 9, 11]:
+    elif input_month in [4, 6, 9, 11]:
         days_num = 30
     else:
-        if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0):
+        if input_year % 4 == 0 and (input_year % 100 != 0 or input_year % 400 == 0):
             days_num = 29
         else:
             days_num = 28
     for day in range(1, days_num + 1):
-        days.append('%d/%d/%d' % (year, month, day))
+        days.append('%d/%d/%d' % (input_year, input_month, day))
+
+    # 刨除法定节假日
+    while True:
+        holidays = input('输入法定节日，空格隔开: ')
+        holidays = holidays.split(' ')
+        holidays = map(lambda x: int(x), holidays)
+
+        # 检查输入的合法性
+        if not set(holidays).issubset(set(range(1, days_num+1))):
+            print('请检查输入的合法性! (1 ~ %d)' % days_num)
+            continue
+
+        for holiday in holidays:
+            days.remove('%d/%d/%d' % (year, month, holiday))
+        break
 
     # 刨除周末
     # days = list(filter(lambda x: datetime.strptime(x, '%Y/%m/%d').isoweekday() < 6, days))
     days = [day for day in days if datetime.strptime(day, '%Y/%m/%d').isoweekday() < 6]
-
-    # 刨除节假日
-    # TODO: 输入法定节假日
 
     return days
 
@@ -97,9 +109,9 @@ if __name__ == '__main__':
     previous_row = table.row_values(1)
 
     # 获取表格的年份、月份
-    #year = previous_row[TIME].split('/')[0]
-    #month = previous_row[TIME].split('/')[1]
-    #workdays = work_calendar(year, month)
+    year = int(previous_row[TIME].split('/')[0])
+    month = int(previous_row[TIME].split('/')[1])
+    workdays = work_calendar(year, month)
 
     # 记录第一行
     new_row = previous_row

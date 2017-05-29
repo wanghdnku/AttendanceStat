@@ -30,9 +30,6 @@ def work_calendar(year, month):
     # days = list(filter(lambda x: datetime.strptime(x, '%Y/%m/%d').isoweekday() < 6, days))
     days = [day for day in days if datetime.strptime(day, '%Y/%m/%d').isoweekday() < 6]
 
-
-
-
     return days
 
 
