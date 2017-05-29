@@ -65,7 +65,7 @@ def work_calendar(input_year, input_month):
     while True:
         holidays = input('输入法定节日，空格隔开: ')
         holidays = holidays.split(' ')
-        holidays = map(lambda x: int(x), holidays)
+        holidays = list(map(lambda x: int(x), holidays))
 
         # 检查输入的合法性
         if not set(holidays).issubset(set(range(1, days_num+1))):
@@ -73,7 +73,7 @@ def work_calendar(input_year, input_month):
             continue
 
         for holiday in holidays:
-            days.remove('%d/%d/%d' % (year, month, holiday))
+            days.remove('%d/%d/%d' % (input_year, input_month, holiday))
         break
 
     # 刨除周末
@@ -94,6 +94,7 @@ if __name__ == '__main__':
     # 计算行数
     rows_number = table.nrows
 
+    # 创建要写入的csv文件，记录统计结果
     csv_path = '/Users/hayden/Desktop/new_new.csv'
     csv_file = open(csv_path, 'w', encoding='gbk')
     writer = csv.writer(csv_file)
@@ -117,6 +118,9 @@ if __name__ == '__main__':
     new_row = previous_row
     new_row[4] = previous_row[TIME].split(' ')[1]
 
+    # 记录出勤情况的字典，键是员工名字，值是一个保存日期的列表
+    absence = dict()
+
     # 遍历每行
     for index in range(2, rows_number):
         row = table.row_values(index)
@@ -128,6 +132,11 @@ if __name__ == '__main__':
             new_row[3] = previous_row[TIME].split(' ')[0]
             new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
             writer.writerow(new_row)
+            # 计入出勤统计
+            if new_row[NAME] not in absence:
+                absence[new_row[NAME]] = [new_row[TIME]]
+            else:
+                absence[new_row[NAME]].append(new_row[TIME])
 
             # 缓存下一行
             new_row = row
@@ -140,5 +149,19 @@ if __name__ == '__main__':
     new_row[3] = previous_row[TIME].split(' ')[0]
     new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
     writer.writerow(new_row)
+    # 计入出勤统计
+    if new_row[NAME] not in absence:
+        absence[new_row[NAME]] = [new_row[TIME]]
+    else:
+        absence[new_row[NAME]].append(new_row[TIME])
 
     csv_file.close()
+
+    print(workdays)
+
+    # 统计最终缺勤信息
+    print('缺勤记录')
+    for staff in absence:
+        absence[staff] = list(set(workdays) - set(absence[staff]))
+        if absence[staff]:
+            print('%s: 缺勤%d天 %s' % (staff, len(absence[staff]), sorted(absence[staff], key=lambda x: int(x.split('/')[2]))))
