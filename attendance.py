@@ -63,7 +63,9 @@ def work_calendar(input_year, input_month):
 
     # 刨除法定节假日
     while True:
-        holidays = input('输入法定节日，空格隔开: ')
+        holidays = input('输入法定节日，空格隔开 (若没有，输入N): ')
+        if holidays in 'Nn':
+            break
         holidays = holidays.split(' ')
         holidays = list(map(lambda x: int(x), holidays))
 
@@ -79,6 +81,23 @@ def work_calendar(input_year, input_month):
     # 刨除周末
     # days = list(filter(lambda x: datetime.strptime(x, '%Y/%m/%d').isoweekday() < 6, days))
     days = [day for day in days if datetime.strptime(day, '%Y/%m/%d').isoweekday() < 6]
+
+    # 添加法定补班的周末
+    while True:
+        work_weekends = input('输入补班周末，空格隔开 (若没有，输入N): ')
+        if work_weekends in 'Nn':
+            break
+        work_weekends = work_weekends.split(' ')
+        work_weekends = list(map(lambda x: int(x), work_weekends))
+
+        # 检查输入的合法性
+        if not set(work_weekends).issubset(set(range(1, days_num + 1))):
+            print('请检查输入的合法性! (1 ~ %d)' % days_num)
+            continue
+
+        for work_weekend in work_weekends:
+            days.append('%d/%d/%d' % (input_year, input_month, work_weekend))
+        break
 
     return days
 
