@@ -1,5 +1,6 @@
 import xlrd
 import csv
+import platform
 from datetime import datetime
 
 DEPT = 0
@@ -102,10 +103,15 @@ def work_calendar(input_year, input_month):
     return days
 
 
-if __name__ == '__main__':
+def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
+
+    # 根据操作系统确定路径分隔符
+    path_separator = '\\'
+    if platform.system() == 'Darwin':
+        path_separator = '/'
 
     # 读取Excel数据
-    data = xlrd.open_workbook('/Users/hayden/Desktop/checkin.xlsx')
+    data = xlrd.open_workbook(excel_path)
 
     # 获取第一张Sheet的表格
     table = data.sheets()[0]
@@ -114,7 +120,9 @@ if __name__ == '__main__':
     rows_number = table.nrows
 
     # 创建要写入的csv文件，记录统计结果
-    csv_path = '/Users/hayden/Desktop/new_new.csv'
+    csv_path = path_separator.join(excel_path.split(path_separator)[:-1])
+    csv_path += path_separator
+    csv_path += 'statistics.csv'
     csv_file = open(csv_path, 'w', encoding='gbk')
     writer = csv.writer(csv_file)
 
@@ -184,3 +192,8 @@ if __name__ == '__main__':
         absence[staff] = list(set(workdays) - set(absence[staff]))
         if absence[staff]:
             print('%s: 缺勤%d天 %s' % (staff, len(absence[staff]), sorted(absence[staff], key=lambda x: int(x.split('/')[2]))))
+
+
+if __name__ == '__main__':
+    file_path = input('输入文件路径: ')
+    statistics(file_path)
