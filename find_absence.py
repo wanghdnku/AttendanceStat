@@ -43,11 +43,24 @@ def find_absence():
 
     for (staff, dates) in dic.items():
         for date in dates:
-            absence_list.append([staff_info[staff][0], staff, staff_info[staff][1], date, '-', '-', '意念', '未打卡'])
+            absence_list.append([staff_info[staff][0], staff, staff_info[staff][1], date, '00:00:00', '00:00:00', '意念', '未打卡'])
 
     #print('--------')
     #print(absence_list)
     absence_list = sorted(absence_list, key=lambda x: (x[0], x[1], int(x[3].split('/')[2])))
+
+    '''
+    前一天晚上奋斗到22点以后的，抵扣第二天的迟到
+    '''
+    for index in range(1, len(absence_list)):
+        if '迟到' in absence_list[index][7]:
+            # 检查前一天
+            if absence_list[index-1][1] == absence_list[index][1] and int(absence_list[index-1][5].split(':')[0]) >= 22:
+                print(absence_list[index])
+                if absence_list[index][7] == '迟到':
+                    absence_list[index][7] = '正常'
+                else:
+                    absence_list[index][7] = absence_list[index][7][2:]
 
 
     absence_list = [x for x in absence_list if x[7] != '正常']
