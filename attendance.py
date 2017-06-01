@@ -8,6 +8,11 @@ NAME = 1
 TIME = 3
 
 
+'''
+将字符串类型时间转化为数字类型时间
+:param time_string - 时间字符串，如 9:30:59
+:return double类型的时间
+'''
 def string_to_time(time_string):
     time = time_string.split(':')
     numeric = float(time[0])
@@ -15,6 +20,13 @@ def string_to_time(time_string):
     return numeric
 
 
+'''
+出勤时间检测
+:param department - 部门名称，如'技术部' 
+:param get_on_time - 上班时间，如'8:59:59'
+:param get_off_time - 下班时间，如'18:00:00'
+:return 出勤检测结果，字符串类型
+'''
 def turnout_checking(department, get_on_time, get_off_time):
     on_duty = 9.0
     off_duty = 18.0
@@ -46,6 +58,12 @@ def turnout_checking(department, get_on_time, get_off_time):
     return result
 
 
+'''
+生成工作日的日历，将周末与法定休息日删去
+:param input_year - 输入一个年份，整型
+:param input_month - 输入一个月份，整型
+:return 一个数组，保存了所有工作日，数组元素为字符串格式，如'2017/5/30'
+'''
 def work_calendar(input_year, input_month):
     days = []
 
@@ -71,7 +89,7 @@ def work_calendar(input_year, input_month):
         holidays = list(map(lambda x: int(x), holidays))
 
         # 检查输入的合法性
-        if not set(holidays).issubset(set(range(1, days_num+1))):
+        if not set(holidays).issubset(set(range(1, days_num + 1))):
             print('请检查输入的合法性! (1 ~ %d)' % days_num)
             continue
 
@@ -103,8 +121,13 @@ def work_calendar(input_year, input_month):
     return days
 
 
+'''
+统计出勤信息
+:param excel_path - 输入Excel文件存储的路径
+:return void，将统计结果写入到输入文件同文件夹下的statistics.csv中
+Notice: Excel文件必须是.xlsx，否则会出现编码错误
+'''
 def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
-
     # 根据操作系统确定路径分隔符
     path_separator = '\\'
     if platform.system() == 'Darwin':
@@ -184,16 +207,21 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
 
     csv_file.close()
 
-    print(workdays)
+    print('%d月工作日:' % month)
+    print(workdays, '\n')
 
     # 统计最终缺勤信息
     print('缺勤记录')
     for staff in absence:
         absence[staff] = list(set(workdays) - set(absence[staff]))
         if absence[staff]:
-            print('%s: 缺勤%d天 %s' % (staff, len(absence[staff]), sorted(absence[staff], key=lambda x: int(x.split('/')[2]))))
+            print('%s: 缺勤%d天 %s'
+                  % (staff, len(absence[staff]), sorted(absence[staff], key=lambda x: int(x.split('/')[2]))))
 
 
+'''
+程序主入口
+'''
 if __name__ == '__main__':
     file_path = input('输入文件路径: ')
     statistics(file_path)
