@@ -53,6 +53,7 @@ def find_absence():
     '''
     前一天晚上奋斗到22点以后的，抵扣第二天的迟到
     '''
+    print('豁免记录：')
     for index in range(1, len(absence_list)):
         if '迟到' in absence_list[index][7]:
             # 检查前一天
@@ -69,6 +70,12 @@ def find_absence():
     # 移去正常的记录，只保留不正常的
     absence_list = [x for x in absence_list if x[7] != '正常']
     # print(absence_list)
+
+    # 移去工作日仍然上班的记录
+    # print(workdays)
+    # print(len(absence_list))
+    absence_list = list(filter(lambda x: x[3] in workdays, absence_list))
+    # print(len(absence_list))
 
     '''
     写入到csv文件中
