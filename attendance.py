@@ -28,16 +28,27 @@ def string_to_time(time_string):
 :return 出勤检测结果，字符串类型
 '''
 def turnout_checking(department, get_on_time, get_off_time):
-    on_duty = 9.0
-    off_duty = 18.0
-    if department == '技术部':
-        on_duty = 10.0
-        off_duty = 19.0
 
     result = ''
 
+    # 得到实际上班时间和下班时间
     get_on = string_to_time(get_on_time)
     get_off = string_to_time(get_off_time)
+
+    # 根据部门调整基准上下班时间
+    on_duty = 9.0
+    off_duty = 18.0
+    # 技术部实行弹性工作制，9:30-10:00均可
+    if department == '技术部':
+        on_duty = 10.0
+        # 根据上班时间调整下班时间
+        if get_on < 9.5:
+            off_duty = 18.5
+        elif get_on > 10.0:
+            off_duty = 19.0
+        else:
+            off_duty = get_on + 9.0
+
     if on_duty < get_on <= (on_duty + 0.5):
         result += '迟到'
     elif get_on > on_duty + 0.5:
@@ -52,7 +63,7 @@ def turnout_checking(department, get_on_time, get_off_time):
         result = '正常'
 
     # 疑似漏打卡的情况
-    if get_on_time == get_off_time:
+    if get_off - get_on <= 1.0:
         result = '疑似漏打卡'
 
     return result
