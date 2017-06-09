@@ -139,6 +139,9 @@ def work_calendar(input_year, input_month):
 Notice: Excel文件必须是.xlsx，否则会出现编码错误
 '''
 def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
+
+    # TODO: 加一列计算当天的工时
+
     # 根据操作系统确定路径分隔符
     path_separator = '\\'
     if platform.system() == 'Darwin':

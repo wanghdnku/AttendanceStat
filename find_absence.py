@@ -3,8 +3,9 @@ from attendance import *
 '''
 读取统计表，查找缺勤日期，最后生成一张统计表记录一个月期间不正常打卡的记录
 '''
-def find_absence():
-    workdays = work_calendar(2017, 5)
+def find_absence(y, m):
+
+    workdays = work_calendar(y, m)
     # 字典类型，记录员工出勤日期，键为姓名，值为一个列表，存储了有打卡记录的日期
     staff_attendance = dict()
     # 字典类型，记录员工的信息，键为姓名，值为一个元组: (部门名称, 考勤号)
@@ -92,4 +93,7 @@ def find_absence():
 主函数入口
 '''
 if __name__ == '__main__':
-    find_absence()
+    year = int(input('请输入年份: '))
+    month = int(input('请输入月份: '))
+
+    find_absence(year, month)
