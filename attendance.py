@@ -3,10 +3,21 @@ import csv
 import platform
 from datetime import datetime
 
+'''
+输入表格：
+0:部门 1:姓名 2:考勤号码 3:日期时间 4:机器号 5:编号(空) 6:比对方式 7:卡号
+
+输出表格：
+0:部门 1:姓名 2:考勤号码 3:工作日 4:上班时间 5:下班时间 6:比对方式 7:出勤情况 8:工时 
+
+缺勤统计表：
+0:部门 1:姓名 2:考勤号码 3:工作日 4:上班时间 5:下班时间 6:比对方式 7:出勤情况 8:工时
+'''
+
 DEPT = 0
 NAME = 1
+NUMB = 2
 TIME = 3
-
 
 '''
 将字符串类型时间转化为数字类型时间
@@ -190,7 +201,8 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
     # 遍历每行
     for index in range(2, rows_number):
         row = table.row_values(index)
-        if row[NAME] == previous_row[NAME] and row[TIME].split(' ')[0] == previous_row[TIME].split(' ')[0]:
+        if row[NUMB] == previous_row[NUMB] and row[TIME].split(' ')[0] == previous_row[TIME].split(' ')[0]:
+            # 将同一个人同一天的其他打卡记录略过
             pass
         else:
             # 将该行写入
