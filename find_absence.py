@@ -58,7 +58,7 @@ def find_absence(y, m):
     for (staff, dates) in staff_attendance.items():
         for date in dates:
             absence_list.append(
-                [staff_info[staff][0], staff, staff_info[staff][1], date, '00:00:00', '00:00:00', '意念', '未打卡'])
+                [staff_info[staff][0], staff, staff_info[staff][1], date, '00:00:00', '00:00:00', '意念', '未打卡', 0])
 
     # 各条记录排序: 1.按部门 2.按姓名 3.按日期
     absence_list = sorted(absence_list, key=lambda x: (x[0], x[1], int(x[3].split('/')[2])))
@@ -90,12 +90,16 @@ def find_absence(y, m):
     absence_list = list(filter(lambda x: x[3] in workdays, absence_list))
     # print(len(absence_list))
 
+    ##########
+    # absence_list = list(filter(lambda x: x[3] not in '2017/6/8', absence_list))
+    ##########
+
     '''
     写入到csv文件中
     '''
     with open('/Users/hayden/Desktop/absence.csv', 'w', encoding='gbk') as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(['部门', '姓名', '考勤号码', '工作日', '上班时间', '下班时间', '比对方式', '出勤情况'])
+        writer.writerow(['部门', '姓名', '考勤号码', '工作日', '上班时间', '下班时间', '比对方式', '出勤情况', '工时'])
         # 循环将每一行依次写入到csv文件中
         for row in absence_list:
             writer.writerow(row)
