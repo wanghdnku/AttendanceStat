@@ -1,7 +1,8 @@
-import xlrd
 import csv
+import xlrd
 import platform
 from datetime import datetime
+from find_absence import find_absence
 
 '''
 输入表格：
@@ -162,8 +163,6 @@ Notice: Excel文件必须是.xlsx，否则会出现编码错误
 '''
 def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
 
-    # TODO: 加一列计算当天的工时
-
     # 根据操作系统确定路径分隔符
     path_separator = '\\'
     if platform.system() == 'Darwin':
@@ -259,6 +258,8 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
             print('%s: 缺勤%d天 %s'
                   % (staff, len(absence[staff]), sorted(absence[staff], key=lambda x: int(x.split('/')[2]))))
 
+    # 检查缺勤记录
+    find_absence(csv_path, workdays)
 
 '''
 程序主入口

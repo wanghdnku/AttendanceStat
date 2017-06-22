@@ -1,4 +1,5 @@
-from attendance import *
+import platform
+import csv
 
 '''
 输入表格：
@@ -14,10 +15,11 @@ from attendance import *
 
 '''
 读取统计表，查找缺勤日期，最后生成一张统计表记录一个月期间不正常打卡的记录
+:param input_path - 统计表文件 statistics.csv 所在路径
+:return workdays - 工作日列表
 '''
-def find_absence(y, m):
+def find_absence(input_path, workdays):
 
-    workdays = work_calendar(y, m)
     # 字典类型，记录员工出勤日期，键为姓名，值为一个列表，存储了有打卡记录的日期
     staff_attendance = dict()
     # 字典类型，记录员工的信息，键为姓名，值为一个元组: (部门名称, 考勤号)
@@ -90,6 +92,7 @@ def find_absence(y, m):
     absence_list = list(filter(lambda x: x[3] in workdays, absence_list))
     # print(len(absence_list))
 
+    # TODO: 如果不是一整周的话，多输入一天以计算缺勤记录，最后要把这一天删去
     ##########
     # absence_list = list(filter(lambda x: x[3] not in '2017/6/8', absence_list))
     ##########
@@ -97,19 +100,20 @@ def find_absence(y, m):
     '''
     写入到csv文件中
     '''
-    with open('/Users/hayden/Desktop/absence.csv', 'w', encoding='gbk') as csv_file:
+    # 生成输出路径
+
+    # 根据操作系统确定路径分隔符
+    path_separator = '\\'
+    if platform.system() == 'Darwin':
+        path_separator = '/'
+    csv_path = path_separator.join(input_path.split(path_separator)[:-1])
+    csv_path += path_separator
+    csv_path += 'absence.csv'
+
+    with open(csv_path, 'w', encoding='gbk') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(['部门', '姓名', '考勤号码', '工作日', '上班时间', '下班时间', '比对方式', '出勤情况', '工时'])
         # 循环将每一行依次写入到csv文件中
         for row in absence_list:
             writer.writerow(row)
 
-
-'''
-主函数入口
-'''
-if __name__ == '__main__':
-    year = int(input('请输入年份: '))
-    month = int(input('请输入月份: '))
-
-    find_absence(year, month)
