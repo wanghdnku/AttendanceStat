@@ -1,5 +1,8 @@
-import platform
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import csv
+import platform
 
 '''
 输入表格：
@@ -18,7 +21,7 @@ import csv
 :param input_path - 统计表文件 statistics.csv 所在路径
 :return workdays - 工作日列表
 '''
-def find_absence(input_path, workdays):
+def find_absence(input_path, workdays, encoding='gbk'):
 
     # 字典类型，记录员工出勤日期，键为姓名，值为一个列表，存储了有打卡记录的日期
     staff_attendance = dict()
@@ -28,7 +31,7 @@ def find_absence(input_path, workdays):
     attendance_list = []
 
     # 读取前面生成的统计表
-    with open('/Users/hayden/Desktop/statistics.csv', 'r', encoding='gbk') as csv_file:
+    with open('/Users/hayden/Desktop/statistics.csv', 'r', encoding=encoding) as csv_file:
         reader = csv.reader(csv_file)
         for row in reader:
             if row[0] != '部门':
@@ -110,7 +113,7 @@ def find_absence(input_path, workdays):
     csv_path += path_separator
     csv_path += 'absence.csv'
 
-    with open(csv_path, 'w', encoding='gbk') as csv_file:
+    with open(csv_path, 'w', encoding=encoding) as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(['部门', '姓名', '考勤号码', '工作日', '上班时间', '下班时间', '比对方式', '出勤情况', '工时'])
         # 循环将每一行依次写入到csv文件中

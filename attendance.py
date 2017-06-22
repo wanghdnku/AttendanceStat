@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import csv
 import xlrd
 import platform
@@ -161,7 +164,7 @@ def work_calendar(input_year, input_month):
 :return void，将统计结果写入到输入文件同文件夹下的statistics.csv中
 Notice: Excel文件必须是.xlsx，否则会出现编码错误
 '''
-def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
+def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
 
     # 根据操作系统确定路径分隔符
     path_separator = '\\'
@@ -181,7 +184,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
     csv_path = path_separator.join(excel_path.split(path_separator)[:-1])
     csv_path += path_separator
     csv_path += 'statistics.csv'
-    csv_file = open(csv_path, 'w', encoding='gbk')
+    csv_file = open(csv_path, 'w', encoding=encoding)
     writer = csv.writer(csv_file)
 
     # 写入表头
@@ -259,7 +262,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
                   % (staff, len(absence[staff]), sorted(absence[staff], key=lambda x: int(x.split('/')[2]))))
 
     # 检查缺勤记录
-    find_absence(csv_path, workdays)
+    find_absence(csv_path, workdays, encoding)
 
 '''
 程序主入口
