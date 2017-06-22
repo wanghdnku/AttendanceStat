@@ -17,7 +17,7 @@ from datetime import datetime
 DEPT = 0
 NAME = 1
 NUMB = 2
-TIME = 3
+DATE = 3
 
 '''
 将字符串类型时间转化为数字类型时间
@@ -99,7 +99,17 @@ def work_calendar(input_year, input_month):
             days_num = 29
         else:
             days_num = 28
-    for day in range(1, days_num + 1):
+
+    # 设置可以输入起止时间
+    while True:
+        date_period = input('输入起止时间 (如: 19-23): ')
+        start_date, end_date = map(lambda x: int(x), date_period.split('-'))
+        if start_date < 1 or end_date > days_num:
+            print('输入日期超出了当月范围! (1 ~ %d)' % days_num)
+            continue
+        break
+
+    for day in range(start_date, end_date + 1):
         days.append('%d/%d/%d' % (input_year, input_month, day))
 
     # 刨除法定节假日
@@ -111,10 +121,11 @@ def work_calendar(input_year, input_month):
         holidays = list(map(lambda x: int(x), holidays))
 
         # 检查输入的合法性
-        if not set(holidays).issubset(set(range(1, days_num + 1))):
-            print('请检查输入的合法性! (1 ~ %d)' % days_num)
+        if not set(holidays).issubset(set(range(start_date, end_date + 1))):
+            print('请检查输入的合法性! (%d ~ %d)' % (start_date, end_date))
             continue
 
+        # 从日历列表中移除法定假日
         for holiday in holidays:
             days.remove('%d/%d/%d' % (input_year, input_month, holiday))
         break
@@ -132,8 +143,8 @@ def work_calendar(input_year, input_month):
         work_weekends = list(map(lambda x: int(x), work_weekends))
 
         # 检查输入的合法性
-        if not set(work_weekends).issubset(set(range(1, days_num + 1))):
-            print('请检查输入的合法性! (1 ~ %d)' % days_num)
+        if not set(work_weekends).issubset(set(range(start_date, end_date + 1))):
+            print('请检查输入的合法性! (%d ~ %d)' % (start_date, end_date))
             continue
 
         for work_weekend in work_weekends:
@@ -187,13 +198,13 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
     previous_row = table.row_values(1)
 
     # 获取表格的年份、月份
-    year = int(previous_row[TIME].split('/')[0])
-    month = int(previous_row[TIME].split('/')[1])
+    year = int(previous_row[DATE].split('/')[0])
+    month = int(previous_row[DATE].split('/')[1])
     workdays = work_calendar(year, month)
 
     # 记录第一行
     new_row = previous_row
-    new_row[4] = previous_row[TIME].split(' ')[1]
+    new_row[4] = previous_row[DATE].split(' ')[1]
 
     # 记录出勤情况的字典，键是员工名字，值是一个保存日期的列表
     absence = dict()
@@ -201,39 +212,39 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx'):
     # 遍历每行
     for index in range(2, rows_number):
         row = table.row_values(index)
-        if row[NUMB] == previous_row[NUMB] and row[TIME].split(' ')[0] == previous_row[TIME].split(' ')[0]:
+        if row[NUMB] == previous_row[NUMB] and row[DATE].split(' ')[0] == previous_row[DATE].split(' ')[0]:
             # 将同一个人同一天的其他打卡记录略过
             pass
         else:
             # 将该行写入
-            new_row[5] = previous_row[TIME].split(' ')[1]
-            new_row[3] = previous_row[TIME].split(' ')[0]
+            new_row[5] = previous_row[DATE].split(' ')[1]
+            new_row[3] = previous_row[DATE].split(' ')[0]
             new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
             new_row.append(round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2))
             writer.writerow(new_row)
             # 计入出勤统计
             if new_row[NAME] not in absence:
-                absence[new_row[NAME]] = [new_row[TIME]]
+                absence[new_row[NAME]] = [new_row[DATE]]
             else:
-                absence[new_row[NAME]].append(new_row[TIME])
+                absence[new_row[NAME]].append(new_row[DATE])
 
             # 缓存下一行
             new_row = row
-            new_row[4] = row[TIME].split(' ')[1]
+            new_row[4] = row[DATE].split(' ')[1]
 
         previous_row = row
 
     # 将最后一行写入
-    new_row[5] = previous_row[TIME].split(' ')[1]
-    new_row[3] = previous_row[TIME].split(' ')[0]
+    new_row[5] = previous_row[DATE].split(' ')[1]
+    new_row[3] = previous_row[DATE].split(' ')[0]
     new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
     new_row.append(round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2))
     writer.writerow(new_row)
     # 计入出勤统计
     if new_row[NAME] not in absence:
-        absence[new_row[NAME]] = [new_row[TIME]]
+        absence[new_row[NAME]] = [new_row[DATE]]
     else:
-        absence[new_row[NAME]].append(new_row[TIME])
+        absence[new_row[NAME]].append(new_row[DATE])
 
     csv_file.close()
 
