@@ -3,6 +3,8 @@
 
 import csv
 
+# FIXME: 将输入区间少设一天，来解决此问题？
+
 def remove_records(path, day, encoding='gbk'):
 
     records = []
