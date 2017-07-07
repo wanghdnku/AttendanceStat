@@ -74,9 +74,11 @@ def find_absence(input_path, workdays, encoding='gbk'):
     print('豁免记录：')
     for index in range(1, len(absence_list)):
         if '迟到' in absence_list[index][7]:
+            # 加班豁免时间按部门而定，技术部为22点以后，其他部门为21点以后。
+            overtime = 22 if absence_list[index][0] == '技术部' else 21
             # 检查前一天
-            if absence_list[index - 1][1] == absence_list[index][1] and int(
-                    absence_list[index - 1][5].split(':')[0]) >= 22:
+            if absence_list[index - 1][1] == absence_list[index][1] \
+                    and int(absence_list[index - 1][5].split(':')[0]) >= overtime:
                 # 打印一下抵扣迟到的记录
                 print(absence_list[index])
                 # 如果只有迟到的，标为正常。如果当天还有别的记录，仅仅抹去迟到
