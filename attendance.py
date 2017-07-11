@@ -18,29 +18,62 @@ from find_absence import find_absence
 0:部门 1:姓名 2:考勤号码 3:工作日 4:上班时间 5:下班时间 6:比对方式 7:出勤情况 8:工时
 '''
 
+
 DEPT = 0
 NAME = 1
 NUMB = 2
 DATE = 3
+ON = 4
+OFF = 5
+CHECK = 6
+ATTENDANCE = 7
+
 
 '''
-将字符串类型时间转化为数字类型时间
-:param time_string - 时间字符串，如 9:30:59
-:return double类型的时间
+将字符串类型时间转化为数字类型时间。
+:param string_time - 时间字符串，如 '9:30:59'。
+:return double类型的时间，如 9.5。
 '''
-def string_to_time(time_string):
-    time = time_string.split(':')
-    numeric = float(time[0])
-    numeric += float(time[1]) / 60
-    return numeric
+def string_to_time(string_time):
+    time = string_time.split(':')
+    numeric_time = float(time[0])
+    numeric_time += float(time[1]) / 60
+    return numeric_time
+
+
+'''
+判断各部门人员应该的上班和下班时间。
+:param department - 部门名称，如 '技术部'。
+:param get_on - 上班时间，用来动态判断应该的下班时间，适用于技术部。
+:return 应该的上班和下班时间, double类型。 
+'''
+def schedule_for_department(department, get_on):
+
+    # 根据部门调整基准上下班时间
+    on_duty = 9.0
+    off_duty = 18.0
+
+    # 技术部实行弹性工作制，9:30-10:00均可
+    if department == '技术部':
+        on_duty = 10.0
+
+        # 根据上班时间调整下班时间
+        if get_on < 9.5:
+            off_duty = 18.5
+        elif get_on > 10.0:
+            off_duty = 19.0
+        else:
+            off_duty = get_on + 9.0
+
+    return on_duty, off_duty
 
 
 '''
 出勤时间检测
-:param department - 部门名称，如'技术部' 
-:param get_on_time - 上班时间，如'8:59:59'
-:param get_off_time - 下班时间，如'18:00:00'
-:return 出勤检测结果，字符串类型
+:param department - 部门名称，如 '技术部'。 
+:param get_on_time - 上班时间，如 '8:59:59'。
+:param get_off_time - 下班时间，如 '18:00:00'。
+:return 出勤检测结果，字符串类型，如 '正常'、'早退'、'旷工'等。
 '''
 def turnout_checking(department, get_on_time, get_off_time):
 
@@ -50,30 +83,22 @@ def turnout_checking(department, get_on_time, get_off_time):
     get_on = string_to_time(get_on_time)
     get_off = string_to_time(get_off_time)
 
-    # 根据部门调整基准上下班时间
-    on_duty = 9.0
-    off_duty = 18.0
-    # 技术部实行弹性工作制，9:30-10:00均可
-    if department == '技术部':
-        on_duty = 10.0
-        # 根据上班时间调整下班时间
-        if get_on < 9.5:
-            off_duty = 18.5
-        elif get_on > 10.0:
-            off_duty = 19.0
-        else:
-            off_duty = get_on + 9.0
+    # 根据部门和上班时间，计算出上班和下班的时间
+    on_duty, off_duty = schedule_for_department(department, get_on)
 
+    # 检查上班时间
     if on_duty < get_on <= (on_duty + 0.5):
         result += '迟到'
     elif get_on > on_duty + 0.5:
         result += '旷工'
 
+    # 检查下班时间
     if (off_duty - 0.5) <= get_off < off_duty:
         result += '早退'
     elif get_off < off_duty - 0.5:
         result += '旷工'
 
+    # 输出结果
     if result == '':
         result = '正常'
 
@@ -174,7 +199,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
     # 读取Excel数据
     data = xlrd.open_workbook(excel_path)
 
-    # 获取第一张Sheet的表格
+    # 获取第一张工作表
     table = data.sheets()[0]
 
     # 计算行数
@@ -184,6 +209,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
     csv_path = path_separator.join(excel_path.split(path_separator)[:-1])
     csv_path += path_separator
     csv_path += 'statistics.csv'
+
     csv_file = open(csv_path, 'w', encoding=encoding)
     writer = csv.writer(csv_file)
 
