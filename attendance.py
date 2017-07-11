@@ -210,71 +210,70 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
     csv_path += path_separator
     csv_path += 'statistics.csv'
 
-    csv_file = open(csv_path, 'w', encoding=encoding)
-    writer = csv.writer(csv_file)
+    with open(csv_path, 'w', encoding=encoding) as csv_file:
 
-    # 写入表头
-    header = table.row_values(0)
-    header[3] = '工作日'
-    header[4] = '上班时间'
-    header[5] = '下班时间'
-    header[7] = '出勤情况'
-    # 再加一行工时
-    header.append('工时')
-    writer.writerow(header)
+        writer = csv.writer(csv_file)
 
-    previous_row = table.row_values(1)
+        # 写入表头
+        header = table.row_values(0)
+        header[3] = '工作日'
+        header[4] = '上班时间'
+        header[5] = '下班时间'
+        header[7] = '出勤情况'
+        # 再加一行工时
+        header.append('工时')
+        writer.writerow(header)
+
+        previous_row = table.row_values(1)
+
+        # 记录第一行
+        new_row = previous_row
+        new_row[4] = previous_row[DATE].split(' ')[1]
+
+        # 记录出勤情况的字典，键是员工名字，值是一个保存日期的列表
+        absence = dict()
+
+        # 遍历每行
+        for index in range(2, rows_number):
+            excel_row = table.row_values(index)
+            if excel_row[NUMB] == previous_row[NUMB] and excel_row[DATE].split(' ')[0] == previous_row[DATE].split(' ')[0]:
+                # 将同一个人同一天的其他打卡记录略过
+                pass
+            else:
+                # 将该行写入
+                new_row[5] = previous_row[DATE].split(' ')[1]
+                new_row[3] = previous_row[DATE].split(' ')[0]
+                new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
+                new_row.append(round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2))
+                writer.writerow(new_row)
+                # 计入出勤统计
+                if new_row[NAME] not in absence:
+                    absence[new_row[NAME]] = [new_row[DATE]]
+                else:
+                    absence[new_row[NAME]].append(new_row[DATE])
+
+                # 缓存下一行
+                new_row = excel_row
+                new_row[4] = excel_row[DATE].split(' ')[1]
+
+            previous_row = excel_row
+
+        # 将最后一行写入
+        new_row[5] = previous_row[DATE].split(' ')[1]
+        new_row[3] = previous_row[DATE].split(' ')[0]
+        new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
+        new_row.append(round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2))
+        writer.writerow(new_row)
+        # 计入出勤统计
+        if new_row[NAME] not in absence:
+            absence[new_row[NAME]] = [new_row[DATE]]
+        else:
+            absence[new_row[NAME]].append(new_row[DATE])
 
     # 获取表格的年份、月份
     year = int(previous_row[DATE].split('/')[0])
     month = int(previous_row[DATE].split('/')[1])
     workdays = work_calendar(year, month)
-
-    # 记录第一行
-    new_row = previous_row
-    new_row[4] = previous_row[DATE].split(' ')[1]
-
-    # 记录出勤情况的字典，键是员工名字，值是一个保存日期的列表
-    absence = dict()
-
-    # 遍历每行
-    for index in range(2, rows_number):
-        row = table.row_values(index)
-        if row[NUMB] == previous_row[NUMB] and row[DATE].split(' ')[0] == previous_row[DATE].split(' ')[0]:
-            # 将同一个人同一天的其他打卡记录略过
-            pass
-        else:
-            # 将该行写入
-            new_row[5] = previous_row[DATE].split(' ')[1]
-            new_row[3] = previous_row[DATE].split(' ')[0]
-            new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
-            new_row.append(round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2))
-            writer.writerow(new_row)
-            # 计入出勤统计
-            if new_row[NAME] not in absence:
-                absence[new_row[NAME]] = [new_row[DATE]]
-            else:
-                absence[new_row[NAME]].append(new_row[DATE])
-
-            # 缓存下一行
-            new_row = row
-            new_row[4] = row[DATE].split(' ')[1]
-
-        previous_row = row
-
-    # 将最后一行写入
-    new_row[5] = previous_row[DATE].split(' ')[1]
-    new_row[3] = previous_row[DATE].split(' ')[0]
-    new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
-    new_row.append(round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2))
-    writer.writerow(new_row)
-    # 计入出勤统计
-    if new_row[NAME] not in absence:
-        absence[new_row[NAME]] = [new_row[DATE]]
-    else:
-        absence[new_row[NAME]].append(new_row[DATE])
-
-    csv_file.close()
 
     print('%d月工作日:' % month)
     print(workdays, '\n')
