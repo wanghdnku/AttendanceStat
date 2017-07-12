@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from attendance import *
+from statistics import *
 
 '''
 程序主入口

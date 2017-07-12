@@ -3,7 +3,7 @@
 
 import csv
 import xlrd
-from find_absence import find_absence
+from absence import find_absence
 from utilities import *
 
 '''
