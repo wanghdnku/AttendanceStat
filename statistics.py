@@ -24,7 +24,7 @@ NUMB = 2
 DATE = 3
 ON = 4
 OFF = 5
-CHECK = 6
+HOURS = 6
 ATTENDANCE = 7
 
 
@@ -49,7 +49,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
         writer = csv.writer(csv_file)
 
         # 写入表头
-        header = ['部门', '姓名', '考勤号码', '工作日', '上班时间', '下班时间', '比对方式', '出勤情况', '工时']
+        header = ['部门', '姓名', '考勤号码', '工作日', '上班时间', '下班时间', '工时', '出勤情况']
         writer.writerow(header)
 
         previous_row = table.row_values(1)
@@ -72,7 +72,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
                 new_row[5] = previous_row[DATE].split(' ')[1]
                 new_row[3] = previous_row[DATE].split(' ')[0]
                 new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
-                new_row.append(round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2))
+                new_row[6] = round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2)
                 writer.writerow(new_row)
                 # 计入出勤统计
                 if new_row[NAME] not in absence:
@@ -90,7 +90,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
         new_row[5] = previous_row[DATE].split(' ')[1]
         new_row[3] = previous_row[DATE].split(' ')[0]
         new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
-        new_row.append(round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2))
+        new_row[6] = round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2)
         writer.writerow(new_row)
         # 计入出勤统计
         if new_row[NAME] not in absence:
@@ -107,12 +107,13 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
     print(workdays, '\n')
 
     # 统计最终缺勤信息
-    print('\n缺勤记录')
+    print('缺勤记录')
     for staff in absence:
         absence[staff] = list(set(workdays) - set(absence[staff]))
         if absence[staff]:
             print('%s: 缺勤%d天 %s'
                   % (staff, len(absence[staff]), sorted(absence[staff], key=lambda x: int(x.split('/')[2]))))
+    print('\n')
 
     # 检查缺勤记录
     find_absence(csv_path, workdays, encoding)

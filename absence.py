@@ -63,7 +63,7 @@ def find_absence(input_path, workdays, encoding='gbk'):
     for (staff, dates) in staff_attendance.items():
         for date in dates:
             absence_list.append(
-                [staff_info[staff][0], staff, staff_info[staff][1], date, '00:00:00', '00:00:00', '意念', '未打卡', 0])
+                [staff_info[staff][0], staff, staff_info[staff][1], date, '00:00:00', '00:00:00', 0, '未打卡'])
 
     # 各条记录排序: 1.按部门 2.按姓名 3.按日期
     absence_list = sorted(absence_list, key=lambda x: (x[0], x[1], int(x[3].split('/')[2])))
