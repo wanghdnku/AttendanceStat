@@ -184,6 +184,25 @@ def work_calendar(input_year, input_month):
 
 
 '''
+根据输入文件的路径，计算输出文件的路径，默认输入文件和输出文件在同一个文件夹下。
+:param input_path - 输入文件的路径。
+:param file_name - 输出文件的名字。
+:return 输出文件的路径。
+'''
+def get_output_path(input_path, file_name):
+
+    # 根据操作系统确定路径分隔符
+    path_separator = '/' if platform.system() == 'Darwin' else '\\'
+
+    # 去掉输入文件的文件名，并改为输出文件名
+    result = path_separator.join(input_path.split(path_separator)[:-1])
+    result += path_separator
+    result += file_name
+
+    return result
+
+
+'''
 统计出勤信息
 :param excel_path - 输入Excel文件存储的路径
 :return void，将统计结果写入到输入文件同文件夹下的statistics.csv中
@@ -191,37 +210,20 @@ Notice: Excel文件必须是.xlsx，否则会出现编码错误
 '''
 def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
 
-    # 根据操作系统确定路径分隔符
-    path_separator = '\\'
-    if platform.system() == 'Darwin':
-        path_separator = '/'
-
     # 读取Excel数据
     data = xlrd.open_workbook(excel_path)
-
     # 获取第一张工作表
     table = data.sheets()[0]
-
     # 计算行数
     rows_number = table.nrows
 
-    # 创建要写入的csv文件，记录统计结果
-    csv_path = path_separator.join(excel_path.split(path_separator)[:-1])
-    csv_path += path_separator
-    csv_path += 'statistics.csv'
+    csv_path = get_output_path(excel_path, 'statistics.csv')
 
     with open(csv_path, 'w', encoding=encoding) as csv_file:
-
         writer = csv.writer(csv_file)
 
         # 写入表头
-        header = table.row_values(0)
-        header[3] = '工作日'
-        header[4] = '上班时间'
-        header[5] = '下班时间'
-        header[7] = '出勤情况'
-        # 再加一行工时
-        header.append('工时')
+        header = ['部门', '姓名', '考勤号码', '工作日', '上班时间', '下班时间', '比对方式', '出勤情况', '工时']
         writer.writerow(header)
 
         previous_row = table.row_values(1)
@@ -279,7 +281,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
     print(workdays, '\n')
 
     # 统计最终缺勤信息
-    print('缺勤记录')
+    print('\n缺勤记录')
     for staff in absence:
         absence[staff] = list(set(workdays) - set(absence[staff]))
         if absence[staff]:
@@ -288,6 +290,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
 
     # 检查缺勤记录
     find_absence(csv_path, workdays, encoding)
+
 
 '''
 程序主入口
