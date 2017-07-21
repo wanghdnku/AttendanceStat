@@ -73,12 +73,13 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
                 new_row[3] = previous_row[DATE].split(' ')[0]
                 new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
                 new_row[6] = round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2)
-                writer.writerow(new_row)
-                # 计入出勤统计
-                if new_row[NAME] not in absence:
-                    absence[new_row[NAME]] = [new_row[DATE]]
-                else:
-                    absence[new_row[NAME]].append(new_row[DATE])
+                if new_row[DEPT] not in '管理层':
+                    writer.writerow(new_row)
+                    # 计入出勤统计
+                    if new_row[NAME] not in absence:
+                        absence[new_row[NAME]] = [new_row[DATE]]
+                    else:
+                        absence[new_row[NAME]].append(new_row[DATE])
 
                 # 缓存下一行
                 new_row = excel_row
@@ -91,12 +92,13 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
         new_row[3] = previous_row[DATE].split(' ')[0]
         new_row[7] = turnout_checking(new_row[DEPT], new_row[4], new_row[5])
         new_row[6] = round(string_to_time(new_row[5]) - string_to_time(new_row[4]), 2)
-        writer.writerow(new_row)
-        # 计入出勤统计
-        if new_row[NAME] not in absence:
-            absence[new_row[NAME]] = [new_row[DATE]]
-        else:
-            absence[new_row[NAME]].append(new_row[DATE])
+        if new_row[DEPT] not in '管理层':
+            writer.writerow(new_row)
+            # 计入出勤统计
+            if new_row[NAME] not in absence:
+                absence[new_row[NAME]] = [new_row[DATE]]
+            else:
+                absence[new_row[NAME]].append(new_row[DATE])
 
     # 获取表格的年份、月份
     year = int(previous_row[DATE].split('/')[0])
