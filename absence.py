@@ -3,6 +3,7 @@
 
 import csv
 import platform
+from utilities import get_output_path
 
 '''
 输入表格：
@@ -14,7 +15,6 @@ import platform
 缺勤统计表：
 0:部门 1:姓名 2:考勤号码 3:工作日 4:上班时间 5:下班时间 6:比对方式 7:出勤情况 8:工时
 '''
-
 
 '''
 读取统计表，查找缺勤日期，最后生成一张统计表记录一个月期间不正常打卡的记录
@@ -80,7 +80,9 @@ def find_absence(input_path, workdays, encoding='gbk'):
             if absence_list[index - 1][1] == absence_list[index][1] \
                     and int(absence_list[index - 1][5].split(':')[0]) >= overtime:
                 # 打印一下抵扣迟到的记录
-                print(absence_list[index])
+                print('%s (%s, %s): 前一天下班时间 %s, 当天上班时间 %s'
+                      % (absence_list[index][3], absence_list[index][0], absence_list[index][1], absence_list[index - 1][5], absence_list[index][4]))
+                # print(absence_list[index])
                 # 如果只有迟到的，标为正常。如果当天还有别的记录，仅仅抹去迟到
                 if absence_list[index][7] == '迟到':
                     absence_list[index][7] = '正常'
@@ -106,19 +108,11 @@ def find_absence(input_path, workdays, encoding='gbk'):
     写入到csv文件中
     '''
     # 生成输出路径
-
-    # 根据操作系统确定路径分隔符
-    path_separator = '\\'
-    if platform.system() == 'Darwin':
-        path_separator = '/'
-    csv_path = path_separator.join(input_path.split(path_separator)[:-1])
-    csv_path += path_separator
-    csv_path += 'absence.csv'
+    csv_path = get_output_path(input_path, 'absence.csv')
 
     with open(csv_path, 'w', encoding=encoding) as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(['部门', '姓名', '考勤号码', '工作日', '上班时间', '下班时间', '比对方式', '出勤情况', '工时'])
+        writer.writerow(['部门', '姓名', '考勤号码', '工作日', '上班时间', '下班时间', '工时', '出勤情况'])
         # 循环将每一行依次写入到csv文件中
         for row in absence_list:
             writer.writerow(row)
-

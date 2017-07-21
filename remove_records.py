@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 
 import csv
+from utilities import get_output_path
 
 # FIXME: 将输入区间少设一天，来解决此问题？
 
-def remove_records(path, day, encoding='gbk'):
+def remove_records(file_path, remove_date, chosen_encode='gbk'):
 
     records = []
 
-    with open(path, 'r', encoding=encoding) as csv_file:
+    with open(file_path, 'r', encoding=chosen_encode) as csv_file:
         reader = csv.reader(csv_file)
         for row in reader:
-            if row[3] != day:
+            if row[3] != remove_date:
                 records.append(row)
 
-    with open(path, 'w', encoding=encoding) as csv_file:
+    with open(file_path, 'w', encoding=chosen_encode) as csv_file:
         writer = csv.writer(csv_file)
         for row in records:
             writer.writerow(row)
