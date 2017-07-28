@@ -213,3 +213,15 @@ def work_calendar(input_year, input_month):
         break
 
     return days
+
+
+'''
+便捷生成日历的函数，当没有法定假期的时候使用
+'''
+def work_calendar_for_period(input_year, input_month, start_date, end_date):
+    days = []
+    for day in range(start_date, end_date + 1):
+        days.append('%d/%d/%d' % (input_year, input_month, day))
+    # 刨除周末
+    days = [day for day in days if days_in_week(day) < 6]
+    return days
