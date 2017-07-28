@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from statistics import *
+from utilities import *
 
 '''
 程序主入口
@@ -17,6 +18,14 @@ if __name__ == '__main__':
     if encoding_format == '1':
         encoding = 'utf-8'
 
-    file_path = input('输入文件路径: ')
+    file_path = get_input_path()
 
-    statistics(file_path, encoding)
+    csv_path = get_output_path(file_path, 'statistics.csv')
+
+    workdays = work_calendar(2017, 7)
+
+    # 统计出勤信息
+    statistics(file_path, workdays, encoding)
+
+    # 生成缺勤记录
+    find_absence(csv_path, workdays, encoding)

@@ -1,6 +1,48 @@
 import platform
 from datetime import datetime
 
+
+SEPARATOR = '/' if platform.system() == 'Darwin' else '\\'
+
+
+'''
+获取文件路径，删除路径前后的特殊字符
+'''
+def get_input_path():
+    return input('输入文件路径: ').strip('$ ')
+
+
+'''
+根据输入文件路径，输出所在文件夹的路径
+'''
+def get_folder_path(file_path):
+    file_path = file_path.strip('$ ')
+    return SEPARATOR.join(file_path.split(SEPARATOR)[:-1]) + SEPARATOR
+
+
+'''
+生成输出文件路径，指定输出文件名
+'''
+def get_output_path(input_path, file_name):
+    folder = get_folder_path(input_path)
+    return folder + file_name
+
+
+'''
+根据输入的文件，自动检测文件名中的月份、开始日期、结束日期
+'''
+def get_start_end(file_path):
+    file_path = file_path.strip('$ ')
+    file_name = file_path.split(SEPARATOR)[-1]
+    start_date, end_date = file_name[:-5].split('-')
+    assert start_date.split('.')[0] == end_date.split('.')[0]
+    month = int(start_date.split('.')[0])
+    start = int(start_date.split('.')[1])
+    end = int(end_date.split('.')[1])
+
+    return month, start, end
+
+
 '''
 将字符串类型时间转化为数字类型时间。
 :param string_time - 时间字符串，如 '9:30:59'。
@@ -171,22 +213,3 @@ def work_calendar(input_year, input_month):
         break
 
     return days
-
-
-'''
-根据输入文件的路径，计算输出文件的路径，默认输入文件和输出文件在同一个文件夹下。
-:param input_path - 输入文件的路径。
-:param file_name - 输出文件的名字。
-:return 输出文件的路径。
-'''
-def get_output_path(input_path, file_name):
-
-    # 根据操作系统确定路径分隔符
-    path_separator = '/' if platform.system() == 'Darwin' else '\\'
-
-    # 去掉输入文件的文件名，并改为输出文件名
-    result = path_separator.join(input_path.split(path_separator)[:-1])
-    result += path_separator
-    result += file_name
-
-    return result

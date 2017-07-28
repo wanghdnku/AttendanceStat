@@ -34,7 +34,7 @@ ATTENDANCE = 7
 :return void，将统计结果写入到输入文件同文件夹下的statistics.csv中
 Notice: Excel文件必须是.xlsx，否则会出现编码错误
 '''
-def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
+def statistics(excel_path, workdays, encoding='gbk'):
 
     # 读取Excel数据
     data = xlrd.open_workbook(excel_path)
@@ -103,7 +103,7 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
     # 获取表格的年份、月份
     year = int(previous_row[DATE].split('/')[0])
     month = int(previous_row[DATE].split('/')[1])
-    workdays = work_calendar(year, month)
+    # workdays = work_calendar(year, month)
 
     print('%d月工作日:' % month)
     print(workdays, '\n')
@@ -116,14 +116,3 @@ def statistics(excel_path='/Users/hayden/Desktop/checkin.xlsx', encoding='gbk'):
             print('%s: 缺勤%d天 %s'
                   % (staff, len(absence[staff]), sorted(absence[staff], key=lambda x: int(x.split('/')[2]))))
     print('\n')
-
-    # 检查缺勤记录
-    find_absence(csv_path, workdays, encoding)
-
-
-'''
-程序主入口
-'''
-if __name__ == '__main__':
-    file_path = input('输入文件路径: ')
-    statistics(file_path)

@@ -103,5 +103,27 @@ class TurnoutChecking(unittest.TestCase):
         self.assertAlmostEqual(result, '旷工旷工')
 
 
+class GetFolderPath(unittest.TestCase):
+
+    def test_case_1(self):
+        result = get_folder_path('$ /Users/hayden/Desktop/7.1-7.27.xlsx')
+        self.assertEqual(result, '/Users/hayden/Desktop/')
+
+    def test_case_2(self):
+        result = get_folder_path('/Users/hayden/Desktop/7.1-7.27.xlsx  ')
+        self.assertEqual(result, '/Users/hayden/Desktop/')
+
+
+class GetStartEnd(unittest.TestCase):
+
+    def test_case_1(self):
+        result = get_start_end('$ /Users/hayden/Desktop/7.1-7.27.xlsx')
+        self.assertEqual(result, (7, 1, 27))
+
+    def test_case_2(self):
+        result = get_start_end('$ /Users/hayden/Google\ Drive/6.1-6.30.xlsx')
+        self.assertEqual(result, (6, 1, 30))
+
+
 if __name__ == '__main__':
     unittest.main()
