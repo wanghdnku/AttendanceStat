@@ -4,4 +4,5 @@ import platform
 
 path_separator = '/' if platform.system() == 'Darwin' else '\\'
 
-print(path_separator)
+if __name__ == '__main__':
+    print(path_separator)

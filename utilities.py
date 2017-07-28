@@ -41,7 +41,7 @@ def schedule_for_department(department, get_on):
 
 
 '''
-出勤时间检测
+出勤情况检测
 :param department - 部门名称，如 '技术部'。 
 :param get_on_time - 上班时间，如 '8:59:59'。
 :param get_off_time - 下班时间，如 '18:00:00'。
@@ -80,17 +80,12 @@ def turnout_checking(department, get_on_time, get_off_time):
 
     return result
 
-
 '''
-生成工作日的日历，将周末与法定休息日删去
-:param input_year - 输入一个年份，整型
-:param input_month - 输入一个月份，整型
-:return 一个数组，保存了所有工作日，数组元素为字符串格式，如'2017/5/30'
+:param input_month - 月份
+:param input_year - 年份
+:return 一个月的天数，int类型
 '''
-def work_calendar(input_year, input_month):
-    days = []
-
-    # 生成日历
+def number_of_days(input_month, input_year):
     if input_month in [1, 3, 5, 7, 8, 10, 12]:
         days_num = 31
     elif input_month in [4, 6, 9, 11]:
@@ -100,6 +95,30 @@ def work_calendar(input_year, input_month):
             days_num = 29
         else:
             days_num = 28
+
+    return days_num
+
+
+'''
+检查某一天是星期几，每周从周一开始
+:param input_date - 输入的日期。如 '2017/7/28'
+:return int类型，1-7
+'''
+def days_in_week(input_date):
+    return datetime.strptime(input_date, '%Y/%m/%d').isoweekday()
+
+
+'''
+生成工作日的日历，将周末与法定休息日删去
+:param input_year - 输入一个年份，整型
+:param input_month - 输入一个月份，整型
+:return 一个数组，保存了所有工作日，数组元素为字符串格式，如 '2017/5/30'
+'''
+def work_calendar(input_year, input_month):
+    days = []
+
+    # 得出每月的天数
+    days_num = number_of_days(input_month, input_year)
 
     # 设置可以输入起止时间
     while True:
@@ -132,8 +151,7 @@ def work_calendar(input_year, input_month):
         break
 
     # 刨除周末
-    # days = list(filter(lambda x: datetime.strptime(x, '%Y/%m/%d').isoweekday() < 6, days))
-    days = [day for day in days if datetime.strptime(day, '%Y/%m/%d').isoweekday() < 6]
+    days = [day for day in days if days_in_week(day) < 6]
 
     # 添加法定补班的周末
     while True:
