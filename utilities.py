@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import platform
 from datetime import datetime
 
@@ -118,7 +121,7 @@ def turnout_checking(department, get_on_time, get_off_time):
 
     # 疑似漏打卡的情况
     if get_off - get_on <= 1.0:
-        result = '疑似漏打卡'
+        result = '漏打卡'
 
     return result
 
